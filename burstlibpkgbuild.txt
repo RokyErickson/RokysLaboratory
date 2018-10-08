@@ -1,0 +1,40 @@
+# Maintainer: 13thfloorelevators <the13thfloorelevators@protonmail.com>
+                                                                                                                      
+pkgname=cloudburstlib-git
+_realname=BurstLib
+pkgver=r11.r0.g71fda51                                                                                                
+pkgrel=1                                                                                                        
+pkgdesc="BURST's Cloudburst Dapp and dynamic lib"
+arch=('x86_64')                        
+url="htttps://github.com/CurbShifter/BurstLib"
+license=('GPL3')
+makedepends=('boost' 'git' 'curl')
+source=("git+https://github.com/CurbShifter/BurstLib.git")
+sha256sums=('75035a6fbd5873b29c3780d46c23cb47f201907aa9007357228f9dc039f49b72`
+	    `005a80f400afffa9700ac35cc82c0b7ac41c47c20738e535f9e2a4f613d63c2c')
+pkgver() {
+	cd "${srcdir}/${_realname}"
+	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+build() {
+	cd "${srcdir}/${_realname}/Builds/LinuxMakefile" 
+	make CONFIG=Release
+	cd "${srcdir}/${_realname}/TestClient/Builds/LinuxMakefile"
+	make CONFIG=Release
+}
+
+check() {
+	cd "${srcdir}/${_realname}/Builds/LinuxMakefile"
+	make -k check
+	cd "${srcdir}/${_realname}/TestClient/Builds/LinuxMakefile"
+	make -k check	
+}
+
+package() {
+	mkdir /usr/share/cloudburstdapp
+	cd "${srcdir}/${_realname}/Builds/LinuxMakefile/build"
+	install -Dm755 "${_realname}.so" "${pkgdir}/usr/share/cloudburstdapp/${_realname}.so
+	cd "${srcdir}/${_realname}/TestClient/Builds/LinuxMakefile/build"
+	install -Dm755 "Testclient" "${pkgdir}/usr/share/cloudburstdap/Testclient"
+}
